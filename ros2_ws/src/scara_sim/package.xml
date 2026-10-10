@@ -2,10 +2,10 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>scara_sim</name>
-  <version>0.0.0</version>
+  <version>1.0.0</version>
   <description>ROS 2 and MuJoCo simulation package for Yamaha SCARA robot</description>
-  <maintainer email="user@todo.todo">User</maintainer>
-  <license>TODO: License declaration</license>
+  <maintainer email="hung14022005@gmail.com">HunHoang1402</maintainer>
+  <license>MIT</license>
 
   <depend>rclpy</depend>
   <depend>sensor_msgs</depend>

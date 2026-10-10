@@ -7,7 +7,7 @@ MODEL_SRC = os.path.join('..', '..', '..', 'mujoco_sim')
 
 setup(
     name=package_name,
-    version='0.0.0',
+    version='1.0.0',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/ament_index/resource_index/packages',
@@ -22,10 +22,10 @@ setup(
     ],
     install_requires=['setuptools', 'mujoco'],
     zip_safe=True,
-    maintainer='User',
-    maintainer_email='user@todo.todo',
+    maintainer='HunHoang1402',
+    maintainer_email='hung14022005@gmail.com',
     description='ROS 2 and MuJoCo simulation package for Yamaha SCARA robot',
-    license='TODO: License declaration',
+    license='MIT',
     extras_require={'test': ['pytest']},
     entry_points={
         'console_scripts': [
