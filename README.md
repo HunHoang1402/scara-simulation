@@ -89,8 +89,4 @@ ros2 launch scara_sim mujoco_bridge.launch.py
 ros2 topic pub --once /joint_cmds sensor_msgs/msg/JointState "{name: [joint1], position: [0.8]}"
 ```
 
-## Ghi chú
 
-- **Robot mô phỏng:** dùng hình học **YK-XG** (L1 = 142 mm, L2 = 116 mm), không phải YK400XE-4 như tên đề tài.
-- **Tọa độ:** hệ {0} của động học là hệ thế giới MuJoCo xoay 180° quanh trục z.
-- **Đơn vị:** bên trong dùng SI (rad, m); giao diện hiển thị độ và mm.
