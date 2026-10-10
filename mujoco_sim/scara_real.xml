@@ -1,0 +1,77 @@
+<mujoco model="yamaha_scara_real">
+  <compiler angle="radian" coordinate="local" inertiafromgeom="true"/>
+  <option gravity="0 0 -9.81" timestep="0.002"/>
+
+  <default>
+    <joint limited="true" damping="50.0" armature="0.5"/>
+    <geom friction="1 0.5 0.5" density="2700" margin="0.001" type="mesh" contype="0" conaffinity="0"/>
+    <position ctrllimited="true"/>
+  </default>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="512"/>
+    <texture name="texplane" type="2d" builtin="checker" rgb1=".2 .3 .4" rgb2=".1 0.15 0.2" width="512" height="512" mark="cross" markrgb=".8 .8 .8"/>
+    <material name="matplane" reflectance="0.3" texture="texplane" texrepeat="1 1" texuniform="true"/>
+
+    <!-- Yamaha YK-XG: Toàn bộ thân robot màu trắng, trục công cụ bạc -->
+    <material name="mat_white_body" rgba="0.93 0.93 0.94 1" specular="0.5" shininess="0.7"/>
+    <material name="mat_housing" rgba="0.90 0.90 0.92 1" specular="0.4" shininess="0.6"/>
+    <material name="mat_silver_shaft" rgba="0.72 0.73 0.75 1" specular="0.9" shininess="1.0"/>
+    <material name="mat_pedestal" rgba="0.30 0.32 0.38 1" specular="0.2" shininess="0.3"/>
+
+    <!-- File STL thiết kế theo hệ INCH → scale 0.0254 -->
+    <mesh name="part1" file="meshes/part1.stl" scale="0.0254 0.0254 0.0254"/>
+    <mesh name="part2" file="meshes/part2.stl" scale="0.0254 0.0254 0.0254"/>
+    <mesh name="part3" file="meshes/part3.stl" scale="0.0254 0.0254 0.0254"/>
+    <mesh name="part4" file="meshes/part4.stl" scale="0.0254 0.0254 0.0254"/>
+  </asset>
+
+  <worldbody>
+    <light directional="true" diffuse=".8 .8 .8" specular=".3 .3 .3" pos="0 0 5" dir="0 0 -1"/>
+    <light directional="false" diffuse=".4 .4 .5" specular=".1 .1 .1" pos="0.5 -0.5 1.5"/>
+    <geom name="ground" type="plane" size="1 1 0.1" pos="0 0 -0.01" material="matplane" contype="1" conaffinity="1"/>
+
+    <!-- Đế bệ vừa khít theo footprint base (part2) -->
+    <geom name="pedestal" type="box" size="0.092 0.045 0.08"
+          pos="0.053 0 0.08" material="mat_pedestal" contype="1" conaffinity="1"/>
+
+    <!-- ═══ KINEMATIC CHAIN ═══ -->
+
+    <!-- Base (part2) – Thân máy màu trắng ngà Yamaha -->
+    <body name="base_link" pos="0 0 0.16">
+      <geom mesh="part2" material="mat_white_body"/>
+
+      <!-- Link 1 – Cánh tay 1 (part3) màu trắng -->
+      <body name="link1" pos="0 0 0">
+        <!-- J1: Shoulder ±140° = ±2.44 rad -->
+        <joint name="joint1" type="hinge" axis="0 0 1" range="-2.44 2.44" pos="0 0 0"/>
+        <geom mesh="part3" material="mat_white_body"/>
+
+        <!-- Link 2 – Vỏ hộp (part1) màu đen -->
+        <body name="link2" pos="0 0 0">
+          <!-- J2: Elbow ±144° = ±2.51 rad.  Tâm xoay tại X = -0.142 -->
+          <joint name="joint2" type="hinge" axis="0 0 1" range="-2.51 2.51" pos="-0.142 0 0"/>
+          <geom mesh="part1" material="mat_housing"/>
+
+          <!-- Tool shaft (part4) – Trục công cụ màu bạc -->
+          <!-- gravcomp: cancel the tool shaft's weight (70.7 g). Without it the PD-only
+               J3 actuator sags m*g/kp = 0.139 mm below its target at every pose. -->
+          <body name="link3_and_4" pos="0 0 0" gravcomp="1">
+            <!-- J3: Z-slide 130mm  |  J4: R-axis ±360° -->
+            <joint name="joint3" type="slide" axis="0 0 1" range="-0.13 0" damping="100.0" pos="-0.258 0 0"/>
+            <joint name="joint4" type="hinge" axis="0 0 1" range="-6.28 6.28" damping="20.0" armature="0.05" pos="-0.258 0 0"/>
+            <geom mesh="part4" material="mat_silver_shaft" contype="1" conaffinity="1"/>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <!-- PD controller với kv cao để triệt tiêu rung lắc -->
+    <position name="pos_joint1" joint="joint1" kp="2000" kv="300" ctrlrange="-2.44 2.44"/>
+    <position name="pos_joint2" joint="joint2" kp="2000" kv="300" ctrlrange="-2.51 2.51"/>
+    <position name="pos_joint3" joint="joint3" kp="5000" kv="500" ctrlrange="-0.13 0"/>
+    <position name="pos_joint4" joint="joint4" kp="200" kv="50" ctrlrange="-6.28 6.28"/>
+  </actuator>
+</mujoco>

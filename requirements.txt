@@ -1,0 +1,4 @@
+# Control panel and results script. tkinter comes from the system (python3-tk).
+mujoco>=3.1
+numpy
+matplotlib
